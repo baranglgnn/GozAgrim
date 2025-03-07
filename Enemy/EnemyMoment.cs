@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEditor.Tilemaps;
 using UnityEngine;
 
 public class EnemyMoment : MonoBehaviour
@@ -14,6 +13,7 @@ public class EnemyMoment : MonoBehaviour
     public bool IsWalker;//yürüyen düþman
     public bool IsPatroller;//devriye atan düþman
     public bool IsWalkingRight;
+    private bool isFacingRight = true;
     bool Wait;
     bool IsWaiting;
 
@@ -36,6 +36,8 @@ public class EnemyMoment : MonoBehaviour
     
     void Update()
     {
+
+        CheckRotation();
         PitDetected = !Physics2D.OverlapCircle(PitCheck.position, detectionRadius, WhatIsGround);
         WallDetected = Physics2D.OverlapCircle(WallCheck.position, detectionRadius, WhatIsGround);
         GroundDetected = Physics2D.OverlapCircle(GroundCheck.position, detectionRadius, WhatIsGround);
@@ -51,11 +53,13 @@ public class EnemyMoment : MonoBehaviour
     {
         if (IsStatic)
         {
+            
             anim.SetBool("Idle", true);
             rb.constraints = RigidbodyConstraints2D.FreezeAll;
         }
         if (IsWalker)
         {
+            
             rb.constraints = RigidbodyConstraints2D.FreezeRotation;
             anim.SetBool("Idle", false);
             if (!IsWalkingRight)
@@ -69,6 +73,7 @@ public class EnemyMoment : MonoBehaviour
         }
         if (IsPatroller)
         {
+            
             anim.SetBool("Idle", false);
             if (moveToA)
             {
@@ -79,7 +84,7 @@ public class EnemyMoment : MonoBehaviour
 
                 if (Vector2.Distance(transform.position, PointA.position) <= 0.2f)
                 {
-                    StartCoroutine(Waiting());
+                   StartCoroutine(Waiting());
                     moveToA = false;
                     moveToB = true;
                     Flip();
@@ -95,7 +100,7 @@ public class EnemyMoment : MonoBehaviour
 
                 if (Vector2.Distance(transform.position, PointB.position) <= 0.2f)
                 {
-                    StartCoroutine(Waiting());
+                   StartCoroutine(Waiting());
                     moveToA = true;
                     moveToB = false;
                     Flip();
@@ -103,13 +108,29 @@ public class EnemyMoment : MonoBehaviour
             }
         }
     }
+
+    void CheckRotation()
+    {
+        SpriteRenderer spriteRenderer = GetComponent<SpriteRenderer>();
+
+        // Hangi yöne hareket ettiðini kontrol edin
+        if (isFacingRight == true)  // Sola gidiyorsa
+        {
+            spriteRenderer.flipX = false;
+        }
+        else if (IsWalkingRight == false)  // Saða gidiyorsa
+        {
+            spriteRenderer.flipX = true;
+        }
+    }
+
     IEnumerator Waiting()
     {
-        anim.SetBool("Idle", true);
+        anim.SetBool("Idle", true); // Bekleme sýrasýnda idle animasyonu çalýþtýr.
         IsWaiting = true;
-        yield return new WaitForSeconds(WaitTime);
-        IsWaiting = false;
-        anim.SetBool("Idle", false);
+        yield return new WaitForSeconds(WaitTime); // Belirtilen süre kadar bekle.
+        IsWaiting = false;  // Artýk bekleme modunda deðil.
+        anim.SetBool("Idle", false); // Hareket animasyonuna geçiþ.
     }
 
     void Flip()

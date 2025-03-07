@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEditorInternal;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -10,15 +9,29 @@ public class PlayerHealth : MonoBehaviour
     public float CurrentHealth;
 
     public Image HealthBar;
+    public GameObject OlumEkrani;
 
     Animator anim;
 
     bool IsImmune;
     public float ImmunityTime;
+
+
+    public static PlayerHealth Instance;
+
+    private void Awake()
+    {
+        if(Instance == null)
+        {
+            Instance = this;
+        }
+    }
     void Start()
     {
+        
         CurrentHealth = MaxHealth;//baþlangýçta full can olmasý için
         anim = GetComponent<Animator>();    
+        OlumEkrani.SetActive(false);
     }
 
     
@@ -44,6 +57,7 @@ public class PlayerHealth : MonoBehaviour
             {
                 CurrentHealth = 0;
                 Destroy(gameObject);
+                OlumEkrani.SetActive(true);
             }
         }
     }

@@ -12,7 +12,7 @@ public class CameraControl : MonoBehaviour
 
     public static CameraControl Instance;
 
-    [Range(-5,5)]
+    [Range(-10,10)]
     public float minModX,maxModX,minModY,maxModY;
 
 
@@ -26,7 +26,8 @@ public class CameraControl : MonoBehaviour
     }
     void Start()
     {
-        
+        Player = PlayerControl.Instance.gameObject.transform;
+        activeRoom = Player;
     }
 
     

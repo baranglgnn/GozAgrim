@@ -19,6 +19,7 @@ public class CoinBank : MonoBehaviour
     }
     void Start()
     {
+        Bank = PlayerPrefs.GetInt("CoinsAmount", 0);
         BankText.text = "x" + Bank.ToString();
     }
 
@@ -32,6 +33,8 @@ public class CoinBank : MonoBehaviour
     {
         Bank += coinCollected;
         BankText.text = "x" + Bank.ToString();
+        DataManager.instance.CurrentCoin(Bank);
+        Bank = PlayerPrefs.GetInt("CoinsAmount");
 
     }
 }

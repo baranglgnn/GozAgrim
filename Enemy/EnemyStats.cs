@@ -14,6 +14,8 @@ public class EnemyStats : MonoBehaviour
     public float knockBackForceX,knockBackForceY;
     public float damage;
 
+    public GameObject[] lootItems;
+
     public Rigidbody2D rb;
 
     hitEffect effect;
@@ -53,6 +55,21 @@ public class EnemyStats : MonoBehaviour
             currentHealth = 0;
             Instantiate(DeathEffect,transform.position, transform.rotation);
             Instantiate(Coin,transform.position, transform.rotation);
+
+            int lootChance = Random.Range(0, 101);
+            int loots = Random.Range(1, lootItems.Length+1);
+
+            if(lootChance > 50)
+            {
+             Instantiate(lootItems[0],transform.position, Quaternion.identity);
+            }
+            else
+            {
+                Instantiate(lootItems[loots - 1], transform.position, Quaternion.identity);
+            }
+
+            
+
             
 
             Destroy(gameObject);

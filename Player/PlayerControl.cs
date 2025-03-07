@@ -4,46 +4,63 @@ using System.Collections.Generic;
 using System.Security.Cryptography.X509Certificates;
 using System.Xml.Serialization;
 using Unity.Mathematics;
-using Unity.VisualScripting;
-using UnityEditor.Tilemaps;
 using UnityEngine;
 
 
 public class PlayerControl : MonoBehaviour
 {
+    public static PlayerControl Instance;
+
     private float movementDirection;//hareket yönü
-    public float Speed;//hareket hýzý inspectorda görünebilecek(public)
+   // public float Speed;//hareket hýzý inspectorda görünebilecek(public)
     public float JumpPower;//zýplama gücü(public)
     public float GroundCheckRadius;//dairenin yarýçapý(public)
     public float AttackRate = 2f;//saldýrý hýzý
     float nextAttack = 0;//bir sonraki atak zamaný
     public float attackRadius;
-    public float damage;
+    //public float damage;
     
     private bool isFacingRight = true;//karakterin yüzü saða dönük mü?
     private bool isGrounded;//karakterin ayaðý zeminde mi?
+    private bool invIsActive=false;//envanter aktif mi?
+    private bool panelIsActve;//karakter paneli aktif mi
 
     public GameObject GroundCheck;//oyun objesine eriþim saðladýk
     public Transform AttackPoint;
-    public GameObject NinjaStar;
+    public GameObject throwngrenade;
     public Transform FirePoint;
+    public GameObject inventory;
+    public GameObject PlayerPanel;
+
     
 
     public LayerMask groundLayer;//yüzeyin layerý
     public LayerMask enemyLayer;
 
+    WeaponStats weaponStats;
     
     
 
     Rigidbody2D rb;//Rigitbody2D componenetinden bir deðiþken=rb
 
     Animator anim;
+
+
+    private void Awake()
+    {
+        if(Instance==null) 
+        {
+        Instance = this;
+        }
+    }
+
+
     void Start()//oyun baþlatýldýðý an çalýþacak kodlar.
     {
         //rb'ile Rigitbody2D componentini manipüle edebliceðiz.
         rb= GetComponent<Rigidbody2D >();
         anim= GetComponent<Animator>();//anim'ile animatorü manipüle edeceðiz
-        
+        weaponStats = GetComponent<WeaponStats>();
     }
 
     // Update is called once per frame
@@ -56,6 +73,25 @@ public class PlayerControl : MonoBehaviour
         AttackInput();
         Shoot();
        
+        if(Input.GetKeyDown(KeyCode.I) && !invIsActive)
+        {
+            inventory.SetActive(true);
+            invIsActive = true;
+        }else if(Input.GetKeyDown(KeyCode.I) && invIsActive)
+        {
+            inventory.SetActive(false);
+            invIsActive = false;
+        }
+
+        if(Input.GetKeyDown(KeyCode.C) && !panelIsActve)
+        {
+            PlayerPanel.SetActive(true);
+            panelIsActve = true;
+        }else if(Input.GetKeyDown(KeyCode.C) && panelIsActve)
+        {
+            PlayerPanel.SetActive(false);
+            panelIsActve = false;
+        }
 
     }
 
@@ -68,8 +104,8 @@ public class PlayerControl : MonoBehaviour
     {
         //GetAxixRaw=eksende bir hareket yapacaðýmýz için.
         movementDirection = Input.GetAxisRaw("Horizontal");
-        rb.velocity=new Vector2(movementDirection*Speed,rb.velocity.y);//rigitbody nin hýzý x yönünde hareket ederken,y ekseninde sabit kalacak.
-        anim.SetFloat("runSpeed",math.abs(movementDirection*Speed));//runSpeed'e hýzýmýzý atýyoruz.
+        rb.velocity=new Vector2(movementDirection*PlayerStats.instance.runSpeed,rb.velocity.y);//rigitbody nin hýzý x yönünde hareket ederken,y ekseninde sabit kalacak.
+        anim.SetFloat("runSpeed",math.abs(movementDirection*PlayerStats.instance.runSpeed));//runSpeed'e hýzýmýzý atýyoruz.
     }
 
     void CheckRotation()
@@ -139,7 +175,7 @@ public class PlayerControl : MonoBehaviour
 
         foreach(Collider2D enemy in  hitEnemys)
         {
-            enemy.GetComponent<EnemyStats>().takeDamage(damage);
+            enemy.GetComponent<EnemyStats>().takeDamage(weaponStats.DamageInput());
         }
        
     }
@@ -161,12 +197,14 @@ public class PlayerControl : MonoBehaviour
     {
         if(Input.GetKeyDown(KeyCode.LeftShift))
         {
-            if(StarsBank.instance.bankStar>0)
+            if (StarsBank.instance.bankStar > 0)
             {
-             Instantiate(NinjaStar, FirePoint.position, FirePoint.rotation);
-                StarsBank.instance.bankStar -=1;
+                Instantiate(throwngrenade, FirePoint.position, FirePoint.rotation);
+                StarsBank.instance.bankStar -= 1;
+
+                PlayerPrefs.SetInt("StarAmount", StarsBank.instance.bankStar);
             }
-           
+
 
         }
     }

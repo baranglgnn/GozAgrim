@@ -6,11 +6,27 @@ public class HealthPotion : MonoBehaviour
 {
     public float healthToGive;
 
+    GameManagerTwo gameManager;
+    Envanter envanter;
+   
+
+    public GameObject itemToAdd;
+    public int itemAmount;
+
+   
+    void Start()
+    {
+        gameManager = GameManagerTwo.Instance;
+        envanter = gameManager.GetComponent<Envanter>();
+        
+    }
+
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.CompareTag("Player"))
+        if (collision.CompareTag("TriggerZone"))
         {
-            collision.GetComponent<PlayerHealth>().CurrentHealth += healthToGive;
+            envanter.CheckSlotsAvailableity(itemToAdd, itemToAdd.name, itemAmount);
+           // collision.GetComponent<PlayerHealth>().CurrentHealth += healthToGive;
             Destroy(gameObject);
         }
     }

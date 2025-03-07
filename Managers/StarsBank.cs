@@ -19,6 +19,7 @@ public class StarsBank : MonoBehaviour
     }
     void Start()
     {
+        bankStar = PlayerPrefs.GetInt("StarAmount", 0);
         bankText.text ="x " + bankStar.ToString();
 
     }
@@ -34,7 +35,8 @@ public class StarsBank : MonoBehaviour
     {
         bankStar += starCollected;
         bankText.text = "x "+bankStar.ToString();
-        
+        DataManager.instance.CurrentGrenade(bankStar);
+        bankStar = PlayerPrefs.GetInt("StarAmount");
 
     }
 }
